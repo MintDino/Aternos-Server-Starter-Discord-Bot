@@ -3,23 +3,34 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriverManager
 
 def start_aternos_server():
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")  # Run in background
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
-    driver = webdriver.Chrome(service=Service("/usr/local/bin/chromedriver"), options=chrome_options)
+    # Ensure ChromeDriver is installed
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     ATERNOS_URL = "https://aternos.org/go/"
     ATERNOS_USERNAME = os.getenv("ATERNOS_USERNAME")
     ATERNOS_PASSWORD = os.getenv("ATERNOS_PASSWORD")
 
     driver.get(ATERNOS_URL)
-    time.sleep(3)
+    time.sleep(5)
 
-    # Login to Aternos
+    # Click on Login Button
+    try:
+        login_button = driver.find_element(By.XPATH, "//a[contains(@href, '/login/')]")
+        login_button.click()
+        time.sleep(3)
+    except:
+        print("Login button not found. Maybe already logged in?")
+
+    # Enter Username
     driver.find_element(By.ID, "user").send_keys(ATERNOS_USERNAME)
     driver.find_element(By.ID, "password").send_keys(ATERNOS_PASSWORD)
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
@@ -31,17 +42,18 @@ def start_aternos_server():
     driver.get(f"https://aternos.org/server/#{ATERNOS_SERVER_ID}")
     time.sleep(3)
 
-    # Click start if server is offline
     logs = "Server logs:\n"
+
+    # Click start button if found
     try:
         start_button = driver.find_element(By.XPATH, "//button[contains(text(), 'Start')]")
         start_button.click()
-        time.sleep(5)
         logs += "✅ Server start request sent.\n"
+        time.sleep(5)
     except:
         logs += "⚠️ Server is already online or button not found.\n"
 
-    # Fetch logs (Example: Adjust XPath if needed)
+    # Fetch logs
     try:
         log_elements = driver.find_elements(By.CLASS_NAME, "log-line")
         for log in log_elements:
@@ -51,4 +63,3 @@ def start_aternos_server():
 
     driver.quit()
     return logs
-  

@@ -45,13 +45,13 @@ def start_aternos_server():
     logs = "Server logs:\n"
 
     # Click start button if found
-    try:
-        start_button = driver.find_element(By.XPATH, "//button[contains(text(), 'Start')]")
-        start_button.click()
-        logs += "✅ Server start request sent.\n"
-        time.sleep(5)
-    except:
-        logs += "⚠️ Server is already online or button not found.\n"
+     try:
+    start_button = driver.find_element(By.XPATH, "//button[contains(text(), 'Start')]")
+    print("✅ Start button found. Clicking now...")
+    start_button.click()
+    time.sleep(10)
+except:
+    print("❌ Could not find the Start button! Server might already be running.")
 
     # Fetch logs
     try:

@@ -8,7 +8,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 def start_aternos_server():
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--headless")  # Run in background
+    chrome_options.binary_location = "/usr/bin/google-chrome"  # Adjust path if needed
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
@@ -28,13 +29,12 @@ def start_aternos_server():
         login_button.click()
         time.sleep(3)
     except:
-        print("Login button not found. Maybe already logged in?")
+        print("⚠️ Login button not found. Maybe already logged in?")
 
-    # Enter Username
+    # Enter Username & Password
     driver.find_element(By.ID, "user").send_keys(ATERNOS_USERNAME)
     driver.find_element(By.ID, "password").send_keys(ATERNOS_PASSWORD)
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
-
     time.sleep(5)
 
     # Navigate to server page
